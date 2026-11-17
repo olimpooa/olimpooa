@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Caixa de saída')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container">
+	<p><a th:href="@{/admin}">← Voltar ao painel</a></p>
+	<h1>Caixa de saída de e-mails</h1>
+	<p>Modo de envio atual: <strong th:text="${modo}">SIMULADO</strong>.
+		<span th:if="${modo == 'SIMULADO'}">Nenhum e-mail é enviado de verdade: os avisos ficam registrados aqui.</span></p>
+	<p th:if="${#lists.isEmpty(emails)}" class="vazio">Nenhum e-mail gerado ainda.</p>
+	<ul class="emails" th:unless="${#lists.isEmpty(emails)}">
+		<li th:each="e : ${emails}" class="caixa">
+			<h2 th:text="${e.assunto}">Assunto</h2>
+			<p class="meta">Para <strong th:text="${e.destinatario}">email</strong> ·
+				<span th:text="${#temporals.format(e.registradoEm, 'dd/MM/yyyy HH:mm')}">data</span> ·
+				<span th:text="${e.modo}">SIMULADO</span> ·
+				<span th:text="${e.sucesso} ? 'registrado' : 'falhou: ' + ${e.erro}">ok</span></p>
+			<pre th:text="${e.corpo}">corpo</pre>
+		</li>
+	</ul>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

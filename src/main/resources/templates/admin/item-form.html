@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${itemId == null} ? 'Cadastrar item' : 'Editar item')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container">
+	<h1 th:text="${itemId == null} ? 'Cadastrar item' : 'Editar item'">Cadastrar item</h1>
+
+	<form th:action="${itemId == null} ? @{/admin/itens} : @{/admin/itens/{id}(id=${itemId})}" th:object="${form}"
+		  method="post" enctype="multipart/form-data" novalidate>
+		<input type="hidden" name="itemId" th:value="${itemId}">
+		<input type="hidden" th:field="*{fotoArquivo}">
+		<input type="hidden" th:field="*{catalogadoPorIa}">
+
+		<fieldset>
+			<legend>1. Foto e informações de apoio</legend>
+			<div class="grade-form">
+				<div class="campo">
+					<label for="foto">Foto do item</label>
+					<input id="foto" type="file" name="foto" accept="image/jpeg,image/png,image/webp">
+					<p class="meta">JPEG, PNG ou WebP, até 5 MB.</p>
+				</div>
+				<div class="campo" th:if="${form.fotoArquivo != null}">
+					<span class="rotulo">Foto atual</span>
+					<img class="previa" th:src="@{/admin/fotos/{n}(n=${form.fotoArquivo})}" alt="Foto enviada do item">
+				</div>
+				<div class="campo largo" th:classappend="${#fields.hasErrors('informacoesExtras')} ? 'com-erro'">
+					<label for="informacoesExtras">Informações extras para a IA (opcional)</label>
+					<textarea id="informacoesExtras" rows="2" th:field="*{informacoesExtras}" aria-describedby="ajuda-extras erro-extras"
+							  placeholder="ex.: tem um adesivo de gato, achado perto do bebedouro"></textarea>
+					<p id="ajuda-extras" class="meta">Detalhes que não aparecem na foto ajudam a IA. Não escreva dados pessoais.</p>
+					<p id="erro-extras" class="erro-campo" th:if="${#fields.hasErrors('informacoesExtras')}" th:errors="*{informacoesExtras}">Erro</p>
+				</div>
+			</div>
+			<button type="submit" class="botao secundario" formaction="/admin/itens/analisar" formnovalidate>
+				✨ Analisar com IA <span class="meta" th:text="'(' + ${provedorIa} + ')'"></span>
+			</button>
+			<p class="alerta" role="status" th:if="${sugestao != null}"
+			   th:classappend="${sugestao.geradaPorIa} ? 'sucesso' : 'aviso'" th:text="${sugestao.aviso}">Aviso</p>
+		</fieldset>
+
+		<fieldset>
+			<legend>2. Ficha do item <span class="meta" th:if="${form.catalogadoPorIa}">(sugerida por IA, revise)</span></legend>
+			<div class="grade-form">
+				<div class="campo largo" th:classappend="${#fields.hasErrors('titulo')} ? 'com-erro'">
+					<label for="titulo">Título</label>
+					<input id="titulo" type="text" th:field="*{titulo}" required aria-describedby="erro-titulo">
+					<p id="erro-titulo" class="erro-campo" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}">Erro</p>
+				</div>
+				<div class="campo" th:classappend="${#fields.hasErrors('categoria')} ? 'com-erro'">
+					<label for="categoria">Categoria</label>
+					<select id="categoria" th:field="*{categoria}" required aria-describedby="erro-categoria">
+						<option value="">Selecione…</option>
+						<option th:each="c : ${categorias}" th:value="${c}" th:text="${c.rotulo} + (${c.sensivel} ? ' (sensível)' : '')">Categoria</option>
+					</select>
+					<p id="erro-categoria" class="erro-campo" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}">Erro</p>
+				</div>
+				<div class="campo" th:classappend="${#fields.hasErrors('cor')} ? 'com-erro'">
+					<label for="cor">Cor</label>
+					<input id="cor" type="text" th:field="*{cor}">
+					<p class="erro-campo" th:if="${#fields.hasErrors('cor')}" th:errors="*{cor}">Erro</p>
+				</div>
+				<div class="campo" th:classappend="${#fields.hasErrors('marca')} ? 'com-erro'">
+					<label for="marca">Marca</label>
+					<input id="marca" type="text" th:field="*{marca}">
+					<p class="erro-campo" th:if="${#fields.hasErrors('marca')}" th:errors="*{marca}">Erro</p>
+				</div>
+				<div class="campo" th:classappend="${#fields.hasErrors('localEncontrado')} ? 'com-erro'">
+					<label for="localEncontrado">Onde foi encontrado</label>
+					<input id="localEncontrado" type="text" th:field="*{localEncontrado}" list="locais" required aria-describedby="erro-local">
+					<datalist id="locais">
+						<option value="Biblioteca"></option><option value="Cantina"></option><option value="Auditório"></option>
+						<option value="Estacionamento"></option><option value="Portaria"></option><option value="Laboratório de Informática"></option>
+					</datalist>
+					<p id="erro-local" class="erro-campo" th:if="${#fields.hasErrors('localEncontrado')}" th:errors="*{localEncontrado}">Erro</p>
+				</div>
+				<div class="campo" th:classappend="${#fields.hasErrors('dataEncontrado')} ? 'com-erro'">
+					<label for="dataEncontrado">Data em que foi encontrado</label>
+					<input id="dataEncontrado" type="date" th:field="*{dataEncontrado}" required aria-describedby="erro-data">
+					<p id="erro-data" class="erro-campo" th:if="${#fields.hasErrors('dataEncontrado')}" th:errors="*{dataEncontrado}">Erro</p>
+				</div>
+				<div class="campo largo" th:classappend="${#fields.hasErrors('descricao')} ? 'com-erro'">
+					<label for="descricao">Descrição pública</label>
+					<textarea id="descricao" rows="3" th:field="*{descricao}"></textarea>
+					<p class="meta">Aparece para os alunos (exceto em categorias sensíveis).</p>
+					<p class="erro-campo" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}">Erro</p>
+				</div>
+				<div class="campo largo" th:classappend="${#fields.hasErrors('caracteristicasIdentificadoras')} ? 'com-erro'">
+					<label for="caracteristicas">Características para conferência (privado)</label>
+					<textarea id="caracteristicas" rows="2" th:field="*{caracteristicasIdentificadoras}"></textarea>
+					<p class="meta">Só o responsável vê. Use para confirmar o dono presencialmente.</p>
+					<p class="erro-campo" th:if="${#fields.hasErrors('caracteristicasIdentificadoras')}" th:errors="*{caracteristicasIdentificadoras}">Erro</p>
+				</div>
+				<div class="campo largo" th:classappend="${#fields.hasErrors('observacoes')} ? 'com-erro'">
+					<label for="observacoes">Observações internas</label>
+					<textarea id="observacoes" rows="2" th:field="*{observacoes}"></textarea>
+					<p class="erro-campo" th:if="${#fields.hasErrors('observacoes')}" th:errors="*{observacoes}">Erro</p>
+				</div>
+			</div>
+		</fieldset>
+
+		<div class="acoes">
+			<button type="submit" class="botao">Salvar item</button>
+			<a class="botao secundario" th:href="${itemId == null} ? @{/admin} : @{/admin/itens/{id}(id=${itemId})}">Cancelar</a>
+		</div>
+	</form>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

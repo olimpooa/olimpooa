@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Itens encontrados')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container">
+	<section class="hero">
+		<h1>Perdeu alguma coisa no campus?</h1>
+		<p>Veja os itens que o setor de achados e perdidos já catalogou. Achou o seu? Sinalize o interesse e vá retirar
+			presencialmente. Prefere descrever com suas palavras? Use a
+			<a th:href="@{/busca-inteligente}">busca inteligente</a>.</p>
+	</section>
+
+	<form class="filtros" method="get" th:action="@{/}" th:object="${filtro}" aria-label="Filtrar itens">
+		<div class="campo largo">
+			<label for="q">Buscar por palavra</label>
+			<input id="q" type="search" name="q" th:value="*{q}" placeholder="ex.: fone, garrafa azul, mochila">
+		</div>
+		<div class="campo">
+			<label for="categoria">Categoria</label>
+			<select id="categoria" name="categoria">
+				<option value="">Todas</option>
+				<option th:each="c : ${categorias}" th:value="${c}" th:text="${c.rotulo}"
+						th:selected="${filtro.categoria == c}">Categoria</option>
+			</select>
+		</div>
+		<div class="campo">
+			<label for="local">Local onde foi achado</label>
+			<input id="local" type="text" name="local" th:value="*{local}" placeholder="ex.: biblioteca">
+		</div>
+		<div class="campo">
+			<label for="status">Situação</label>
+			<select id="status" name="status">
+				<option value="">Em aberto</option>
+				<option th:each="s : ${statuses}" th:value="${s}" th:text="${s.rotulo}"
+						th:selected="${filtro.status == s}">Status</option>
+			</select>
+		</div>
+		<div class="campo">
+			<label for="de">Achado a partir de</label>
+			<input id="de" type="date" name="de" th:value="*{de}">
+		</div>
+		<div class="campo">
+			<label for="ate">Achado até</label>
+			<input id="ate" type="date" name="ate" th:value="*{ate}">
+		</div>
+		<div class="acoes">
+			<button type="submit" class="botao">Buscar</button>
+			<a class="botao secundario" th:href="@{/}">Limpar</a>
+		</div>
+	</form>
+
+	<p class="contagem" role="status" th:text="${#lists.size(itens)} + (${#lists.size(itens)} == 1 ? ' item encontrado' : ' itens encontrados')">0 itens</p>
+
+	<p th:if="${#lists.isEmpty(itens)}" class="vazio">Nenhum item corresponde aos filtros. Tente outras palavras ou use a
+		<a th:href="@{/busca-inteligente}">busca inteligente</a>.</p>
+
+	<ul class="cards" th:unless="${#lists.isEmpty(itens)}">
+		<li th:each="item : ${itens}" class="card">
+			<a class="card-imagem" th:href="@{/itens/{id}(id=${item.id})}" aria-hidden="true" tabindex="-1">
+				<img th:if="${item.temFoto}" th:src="@{/fotos/{id}(id=${item.id})}" alt="">
+				<span th:unless="${item.temFoto}" class="sem-foto" th:text="${item.sensivel} ? '🔒' : '📦'"></span>
+			</a>
+			<div class="card-corpo">
+				<h2><a th:href="@{/itens/{id}(id=${item.id})}" th:text="${item.titulo}">Título</a></h2>
+				<p><span class="status" th:classappend="'s-' + ${item.status.name()}"
+						 th:text="(${item.status.name() == 'DISPONIVEL'} ? '✔ ' : (${item.status.name() == 'EM_ANALISE'} ? '⏳ ' : '↩ ')) + ${item.status.rotulo}">Status</span></p>
+				<p class="meta"><span th:text="${item.categoria.rotulo}">Categoria</span></p>
+				<p class="meta">Achado em <strong th:text="${item.localEncontrado}">Local</strong>,
+					<time th:datetime="${item.dataEncontrado}" th:text="${#temporals.format(item.dataEncontrado, 'dd/MM/yyyy')}">01/01/2026</time></p>
+				<p class="meta" th:if="${item.sensivel}">Detalhes ocultos por segurança; a conferência é presencial.</p>
+			</div>
+		</li>
+	</ul>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

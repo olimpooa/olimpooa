@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title th:text="${titulo} + ' · Achados e Perdidos UCSal'">Achados e Perdidos UCSal</title>
+	<link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header th:fragment="cabecalho" class="topo">
+	<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+	<div class="topo-interno">
+		<a class="marca" th:href="@{/}">Achados e Perdidos <span>UCSal</span></a>
+		<nav aria-label="Principal">
+			<a th:href="@{/}">Itens</a>
+			<a th:href="@{/busca-inteligente}">Busca inteligente</a>
+			<th:block th:if="${logado}">
+				<a th:href="@{/admin}">Painel</a>
+				<a th:href="@{/admin/itens/novo}">Cadastrar item</a>
+				<form class="inline" th:action="@{/admin/logout}" method="post">
+					<button type="submit" class="link">Sair</button>
+				</form>
+			</th:block>
+			<a th:unless="${logado}" th:href="@{/admin}">Área do responsável</a>
+		</nav>
+	</div>
+</header>
+<footer th:fragment="rodape" class="rodape">
+	<p>Projeto acadêmico POOALAB 2026.2 · Os dados exibidos são fictícios e a retirada dos itens é sempre presencial.</p>
+</footer>
+</body>
+</html>

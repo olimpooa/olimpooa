@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Entrar')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container estreito">
+	<h1>Área do responsável</h1>
+	<p>Acesso restrito a quem cuida do achados e perdidos.</p>
+	<p class="alerta erro" role="alert" th:if="${param.erro}">Usuário ou senha incorretos.</p>
+	<form th:action="@{/admin/login}" method="post">
+		<div class="campo">
+			<label for="username">Usuário</label>
+			<input id="username" name="username" type="text" autocomplete="username" required autofocus>
+		</div>
+		<div class="campo">
+			<label for="password">Senha</label>
+			<input id="password" name="password" type="password" autocomplete="current-password" required>
+		</div>
+		<button type="submit" class="botao">Entrar</button>
+	</form>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Painel do responsável')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container">
+	<div class="titulo-acoes">
+		<h1>Painel do responsável</h1>
+		<div>
+			<a class="botao" th:href="@{/admin/itens/novo}">Cadastrar item</a>
+			<a class="botao secundario" th:href="@{/admin/emails}">Caixa de saída de e-mails</a>
+		</div>
+	</div>
+
+	<p class="alerta sucesso" role="status" th:if="${sucesso}" th:text="${sucesso}"></p>
+
+	<section aria-label="Resumo" class="indicadores">
+		<div class="indicador"><strong th:text="${painel.total}">0</strong><span>itens cadastrados</span></div>
+		<div class="indicador" th:each="e : ${painel.porStatus}"><strong th:text="${e.value}">0</strong><span th:text="${e.key.rotulo}">Status</span></div>
+		<div class="indicador"><strong th:text="${painel.pedidosAtivos}">0</strong><span>pedidos ativos</span></div>
+		<div class="indicador"><strong th:text="${painel.diasMedioAteDevolucao != null} ? ${#numbers.formatDecimal(painel.diasMedioAteDevolucao, 1, 1)} : '–'">–</strong><span>dias até devolver (média)</span></div>
+		<div class="indicador"><strong th:text="${painel.semPedidoHaMuitoTempo}">0</strong><span th:text="'disponíveis há mais de ' + ${diasParado} + ' dias'">parados</span></div>
+	</section>
+
+	<section aria-labelledby="h-cat" th:unless="${#maps.isEmpty(painel.porCategoria)}">
+		<h2 id="h-cat">Itens por categoria</h2>
+		<ul class="categorias">
+			<li th:each="c : ${painel.porCategoria}"><span th:text="${c.key.rotulo}">Categoria</span> <strong th:text="${c.value}">0</strong></li>
+		</ul>
+	</section>
+
+	<section aria-labelledby="h-itens">
+		<h2 id="h-itens">Itens</h2>
+		<form class="filtros simples" method="get" th:action="@{/admin}">
+			<div class="campo">
+				<label for="status">Filtrar por situação</label>
+				<select id="status" name="status">
+					<option value="">Todas</option>
+					<option th:each="s : ${statuses}" th:value="${s}" th:text="${s.rotulo}" th:selected="${statusSelecionado == s}">Status</option>
+				</select>
+			</div>
+			<button type="submit" class="botao secundario">Filtrar</button>
+		</form>
+
+		<p th:if="${#lists.isEmpty(itens)}" class="vazio">Nenhum item nesta situação.</p>
+		<div class="tabela-rolavel" th:unless="${#lists.isEmpty(itens)}">
+			<table>
+				<caption class="so-leitor">Itens cadastrados</caption>
+				<thead>
+				<tr><th scope="col">Item</th><th scope="col">Categoria</th><th scope="col">Local</th><th scope="col">Achado em</th><th scope="col">Situação</th><th scope="col">Pedidos ativos</th></tr>
+				</thead>
+				<tbody>
+				<tr th:each="item : ${itens}">
+					<th scope="row"><a th:href="@{/admin/itens/{id}(id=${item.id})}" th:text="${item.titulo}">Título</a></th>
+					<td th:text="${item.categoria.rotulo}">Categoria</td>
+					<td th:text="${item.localEncontrado}">Local</td>
+					<td th:text="${#temporals.format(item.dataEncontrado, 'dd/MM/yyyy')}">01/01/2026</td>
+					<td><span class="status" th:classappend="'s-' + ${item.status.name()}" th:text="${item.status.rotulo}">Status</span></td>
+					<td th:text="${pedidosAtivos.getOrDefault(item.id, 0L)}">0</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

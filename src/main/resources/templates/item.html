@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${item.titulo})}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container">
+	<p><a th:href="@{/}">← Voltar aos itens</a></p>
+	<article class="detalhe">
+		<div class="detalhe-imagem">
+			<img th:if="${item.temFoto}" th:src="@{/fotos/{id}(id=${item.id})}" th:alt="'Foto do item: ' + ${item.titulo}">
+			<div th:unless="${item.temFoto}" class="sem-foto grande" th:text="${item.sensivel} ? '🔒' : '📦'"></div>
+			<p class="meta" th:if="${item.sensivel}">Este item é de uma categoria sensível: foto e detalhes ficam ocultos
+				e só o responsável os vê, para conferir quem é o dono.</p>
+		</div>
+		<div class="detalhe-info">
+			<h1 th:text="${item.titulo}">Título</h1>
+			<p><span class="status" th:classappend="'s-' + ${item.status.name()}"
+					 th:text="(${item.status.name() == 'DISPONIVEL'} ? '✔ ' : (${item.status.name() == 'EM_ANALISE'} ? '⏳ ' : '↩ ')) + ${item.status.rotulo}">Status</span>
+				<span class="meta" th:text="${item.status.descricao}"></span></p>
+			<dl class="dados">
+				<dt>Categoria</dt><dd th:text="${item.categoria.rotulo}">Categoria</dd>
+				<dt th:if="${item.cor}">Cor</dt><dd th:if="${item.cor}" th:text="${item.cor}">Cor</dd>
+				<dt>Onde foi achado</dt><dd th:text="${item.localEncontrado}">Local</dd>
+				<dt>Quando</dt><dd th:text="${#temporals.format(item.dataEncontrado, 'dd/MM/yyyy')}">01/01/2026</dd>
+				<dt th:if="${item.descricao}">Descrição</dt><dd th:if="${item.descricao}" th:text="${item.descricao}">Descrição</dd>
+			</dl>
+		</div>
+	</article>
+
+	<section class="pedido" aria-labelledby="titulo-pedido">
+		<h2 id="titulo-pedido">É seu? Sinalize o interesse</h2>
+
+		<p th:if="${item.status.name() == 'DEVOLVIDO'}" class="alerta aviso">Este item já foi devolvido e não aceita novos pedidos.</p>
+
+		<th:block th:unless="${item.status.name() == 'DEVOLVIDO'}">
+			<ol class="passos">
+				<li>Informe seus dados institucionais abaixo.</li>
+				<li>Vá presencialmente ao setor de achados e perdidos.</li>
+				<li>O responsável confere se o item é seu. Se mais de uma pessoa pediu o mesmo item, a verificação é feita no local.</li>
+			</ol>
+			<p th:if="${item.status.name() == 'EM_ANALISE'}" class="alerta aviso">Outras pessoas já sinalizaram interesse neste item.
+				Você ainda pode pedir; a confirmação será presencial.</p>
+
+			<p th:if="${erroRegra}" class="alerta erro" role="alert" th:text="${erroRegra}">Erro</p>
+
+			<form th:action="@{/itens/{id}/interesse(id=${item.id})}" th:object="${form}" method="post" novalidate>
+				<div class="grade-form">
+					<div class="campo" th:classappend="${#fields.hasErrors('nome')} ? 'com-erro'">
+						<label for="nome">Nome completo</label>
+						<input id="nome" type="text" th:field="*{nome}" autocomplete="name" required aria-describedby="erro-nome">
+						<p id="erro-nome" class="erro-campo" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">Erro</p>
+					</div>
+					<div class="campo" th:classappend="${#fields.hasErrors('email')} ? 'com-erro'">
+						<label for="email">E-mail institucional</label>
+						<input id="email" type="email" th:field="*{email}" autocomplete="email" placeholder="nome@ucsal.edu.br" required aria-describedby="erro-email">
+						<p id="erro-email" class="erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Erro</p>
+					</div>
+					<div class="campo" th:classappend="${#fields.hasErrors('matricula')} ? 'com-erro'">
+						<label for="matricula">Matrícula</label>
+						<input id="matricula" type="text" inputmode="numeric" th:field="*{matricula}" required aria-describedby="erro-matricula">
+						<p id="erro-matricula" class="erro-campo" th:if="${#fields.hasErrors('matricula')}" th:errors="*{matricula}">Erro</p>
+					</div>
+					<div class="campo largo" th:classappend="${#fields.hasErrors('mensagem')} ? 'com-erro'">
+						<label for="mensagem">Mensagem (opcional)</label>
+						<textarea id="mensagem" rows="2" th:field="*{mensagem}" aria-describedby="erro-mensagem"></textarea>
+						<p id="erro-mensagem" class="erro-campo" th:if="${#fields.hasErrors('mensagem')}" th:errors="*{mensagem}">Erro</p>
+					</div>
+				</div>
+				<p class="meta">Usamos seus dados apenas para esta retirada. Nenhum documento é enviado pelo site.</p>
+				<button type="submit" class="botao">Sinalizar que é meu</button>
+			</form>
+		</th:block>
+	</section>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${item.titulo})}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container">
+	<p><a th:href="@{/admin}">← Voltar ao painel</a></p>
+	<p class="alerta sucesso" role="status" th:if="${sucesso}" th:text="${sucesso}"></p>
+
+	<article class="detalhe">
+		<div class="detalhe-imagem">
+			<img th:if="${item.temFoto()}" th:src="@{/fotos/{id}(id=${item.id})}" th:alt="'Foto do item: ' + ${item.titulo}">
+			<div th:unless="${item.temFoto()}" class="sem-foto grande">📦</div>
+		</div>
+		<div class="detalhe-info">
+			<h1 th:text="${item.titulo}">Título</h1>
+			<p><span class="status" th:classappend="'s-' + ${item.status.name()}"
+					 th:text="(${item.status.name() == 'DISPONIVEL'} ? '✔ ' : (${item.status.name() == 'EM_ANALISE'} ? '⏳ ' : '↩ ')) + ${item.status.rotulo}">Status</span>
+				<span class="meta" th:if="${item.catalogadoPorIa}">Catalogado com IA</span></p>
+			<dl class="dados">
+				<dt>Código</dt><dd th:text="${item.id}">1</dd>
+				<dt>Categoria</dt><dd th:text="${item.categoria.rotulo} + (${item.sensivel} ? ' (sensível: oculto ao público)' : '')">Categoria</dd>
+				<dt>Cor / marca</dt><dd th:text="${item.cor ?: '–'} + ' / ' + ${item.marca ?: '–'}">cor</dd>
+				<dt>Local e data</dt><dd th:text="${item.localEncontrado} + ', ' + ${#temporals.format(item.dataEncontrado, 'dd/MM/yyyy')}">Local</dd>
+				<dt>Descrição</dt><dd th:text="${item.descricao ?: '–'}">Descrição</dd>
+				<dt>Conferência (privado)</dt><dd th:text="${item.caracteristicasIdentificadoras ?: '–'}">Características</dd>
+				<dt>Observações</dt><dd th:text="${item.observacoes ?: '–'}">Obs</dd>
+				<th:block th:if="${item.devolvidoEm != null}">
+					<dt>Devolvido em</dt><dd th:text="${#temporals.format(item.devolvidoEm, 'dd/MM/yyyy HH:mm')} + (${item.devolvidoPara} != null ? ' para ' + ${item.devolvidoPara} : '')">data</dd>
+				</th:block>
+			</dl>
+			<p th:if="${item.status.name() != 'DEVOLVIDO'}"><a class="botao secundario" th:href="@{/admin/itens/{id}/editar(id=${item.id})}">Editar</a></p>
+		</div>
+	</article>
+
+	<section aria-labelledby="h-pedidos">
+		<h2 id="h-pedidos">Pedidos dos alunos</h2>
+		<p th:if="${#lists.isEmpty(interesses)}" class="vazio">Nenhum aluno sinalizou interesse ainda.</p>
+		<p class="alerta aviso" th:if="${item.status.name() == 'EM_ANALISE'}">Confira presencialmente quem é o dono, usando as
+			características privadas acima. Quando entregar, marque o item como devolvido.</p>
+		<div class="tabela-rolavel" th:unless="${#lists.isEmpty(interesses)}">
+			<table>
+				<caption class="so-leitor">Pedidos para este item, em ordem de chegada</caption>
+				<thead><tr><th scope="col">#</th><th scope="col">Nome</th><th scope="col">E-mail</th><th scope="col">Matrícula</th><th scope="col">Mensagem</th><th scope="col">Quando</th><th scope="col">Situação</th></tr></thead>
+				<tbody>
+				<tr th:each="p, it : ${interesses}">
+					<td th:text="${it.count}">1</td>
+					<th scope="row" th:text="${p.nome}">Nome</th>
+					<td th:text="${p.email}">email</td>
+					<td th:text="${p.matricula}">000000</td>
+					<td th:text="${p.mensagem ?: '–'}">msg</td>
+					<td th:text="${#temporals.format(p.criadoEm, 'dd/MM/yyyy HH:mm')}">data</td>
+					<td th:text="${p.situacao.rotulo}">Ativo</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section aria-labelledby="h-acoes" th:if="${item.status.name() != 'DEVOLVIDO'}">
+		<h2 id="h-acoes">Ações</h2>
+		<form class="caixa" th:action="@{/admin/itens/{id}/devolver(id=${item.id})}" method="post">
+			<h3>Registrar devolução</h3>
+			<div class="grade-form">
+				<div class="campo">
+					<label for="retiradoPor">Retirado por (nome)</label>
+					<input id="retiradoPor" name="retiradoPor" type="text" maxlength="120">
+				</div>
+				<div class="campo">
+					<label for="observacao">Observação</label>
+					<input id="observacao" name="observacao" type="text" maxlength="300" placeholder="ex.: conferido com a capinha">
+				</div>
+			</div>
+			<button type="submit" class="botao">Marcar como devolvido</button>
+		</form>
+		<form class="caixa" th:if="${item.status.name() == 'EM_ANALISE'}" th:action="@{/admin/itens/{id}/liberar(id=${item.id})}" method="post">
+			<h3>Ninguém comprovou ser o dono?</h3>
+			<p>O item volta a ficar disponível, os pedidos são encerrados e os alunos recebem um aviso.</p>
+			<button type="submit" class="botao secundario">Liberar item</button>
+		</form>
+	</section>
+
+	<section aria-labelledby="h-hist">
+		<h2 id="h-hist">Histórico de status</h2>
+		<div class="tabela-rolavel">
+			<table>
+				<caption class="so-leitor">Mudanças de status deste item</caption>
+				<thead><tr><th scope="col">Quando</th><th scope="col">De</th><th scope="col">Para</th><th scope="col">Quem</th><th scope="col">Observação</th></tr></thead>
+				<tbody>
+				<tr th:each="h : ${historico}">
+					<td th:text="${#temporals.format(h.em, 'dd/MM/yyyy HH:mm')}">data</td>
+					<td th:text="${h.de != null} ? ${h.de.rotulo} : '–'">–</td>
+					<td th:text="${h.para.rotulo}">Disponível</td>
+					<td th:text="${h.autor}">sistema</td>
+					<td th:text="${h.observacao ?: '–'}">obs</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

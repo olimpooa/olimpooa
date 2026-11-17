@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Busca inteligente')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container">
+	<h1>Busca inteligente</h1>
+	<p>Descreva o que você perdeu com suas palavras (ex.: <em>"perdi um fone branco perto da biblioteca"</em>). A IA compara
+		sua descrição com os itens em aberto. Ela vê apenas dados públicos, nunca fotos nem detalhes identificadores.</p>
+
+	<form class="busca-ia" method="get" th:action="@{/busca-inteligente}">
+		<div class="campo largo">
+			<label for="descricao">O que você perdeu?</label>
+			<textarea id="descricao" name="descricao" rows="3" maxlength="500" required th:text="${descricao}"></textarea>
+		</div>
+		<button type="submit" class="botao">Procurar</button>
+	</form>
+
+	<th:block th:if="${resultado != null}">
+		<p class="alerta aviso" role="status" th:if="${resultado.aviso != null}" th:text="${resultado.aviso}">Aviso</p>
+		<p class="contagem" role="status">
+			<span th:text="${#lists.size(resultado.sugestoes)} + (${#lists.size(resultado.sugestoes)} == 1 ? ' possível correspondência' : ' possíveis correspondências')">0</span>
+			· método: <strong th:text="${resultado.origem}">Gemini</strong>
+		</p>
+		<p th:if="${#lists.isEmpty(resultado.sugestoes)}" class="vazio">Nenhum item parece corresponder. Volte em alguns dias:
+			novos itens são catalogados com frequência.</p>
+		<ol class="sugestoes" th:unless="${#lists.isEmpty(resultado.sugestoes)}">
+			<li th:each="s : ${resultado.sugestoes}" class="sugestao">
+				<h2><a th:href="@{/itens/{id}(id=${s.item.id})}" th:text="${s.item.titulo}">Título</a></h2>
+				<p class="meta">
+					<span th:text="${s.item.categoria.rotulo}">Categoria</span> ·
+					achado em <strong th:text="${s.item.localEncontrado}">Local</strong>,
+					<span th:text="${#temporals.format(s.item.dataEncontrado, 'dd/MM/yyyy')}">01/01/2026</span> ·
+					<span th:text="${s.item.status.rotulo}">Disponível</span>
+				</p>
+				<p>
+					<label th:for="'p' + ${s.item.id}">Compatibilidade:</label>
+					<progress th:id="'p' + ${s.item.id}" max="100" th:value="${s.pontuacao}" th:text="${s.pontuacao} + '%'"></progress>
+					<strong th:text="${s.pontuacao} + '%'">80%</strong>
+				</p>
+				<p th:if="${s.justificativa != null}" th:text="${s.justificativa}">Justificativa</p>
+			</li>
+		</ol>
+	</th:block>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

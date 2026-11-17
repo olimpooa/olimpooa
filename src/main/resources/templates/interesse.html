@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Seu pedido')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container estreito">
+	<h1>Seu pedido</h1>
+
+	<p class="alerta sucesso" role="status" th:if="${interesse.situacao.name() == 'ATIVO'}">
+		✔ Pedido registrado. Guarde esta página: o endereço dela é a forma de acompanhar ou cancelar o pedido.</p>
+	<p class="alerta aviso" th:if="${interesse.situacao.name() == 'CANCELADO'}">Pedido cancelado.</p>
+	<p class="alerta aviso" th:if="${interesse.situacao.name() == 'ENCERRADO'}">Pedido encerrado pelo responsável (o item foi devolvido ou liberado).</p>
+
+	<section class="caixa">
+		<h2 th:text="${item.titulo}">Título</h2>
+		<p><span class="status" th:classappend="'s-' + ${item.status.name()}" th:text="${item.status.rotulo}">Status</span></p>
+		<p class="meta">Achado em <strong th:text="${item.localEncontrado}">Local</strong>,
+			<span th:text="${#temporals.format(item.dataEncontrado, 'dd/MM/yyyy')}">01/01/2026</span></p>
+	</section>
+
+	<section class="caixa" th:if="${interesse.situacao.name() == 'ATIVO'}">
+		<h2>Próximo passo</h2>
+		<p>Vá <strong>presencialmente</strong> ao setor de achados e perdidos. O responsável vai conferir se o item é seu;
+			para itens pessoais, como celular, essa verificação é obrigatória.</p>
+		<form th:action="@{/interesse/{token}/cancelar(token=${interesse.token})}" method="post">
+			<button type="submit" class="botao perigo">Cancelar meu pedido</button>
+		</form>
+	</section>
+
+	<dl class="dados">
+		<dt>Nome</dt><dd th:text="${interesse.nome}">Nome</dd>
+		<dt>Matrícula</dt><dd th:text="${interesse.matricula}">000000</dd>
+		<dt>Pedido feito em</dt><dd th:text="${#temporals.format(interesse.criadoEm, 'dd/MM/yyyy HH:mm')}">01/01/2026</dd>
+	</dl>
+	<p><a th:href="@{/}">← Voltar aos itens</a></p>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

@@ -17,7 +17,7 @@ public record AchadosProperties(
 
 	/** provedor: "auto" (Gemini se houver chave, senão simulado), "gemini" ou "simulado". */
 	public record Ia(@DefaultValue("auto") String provedor, String apiKey,
-			@DefaultValue("gemini-2.5-flash") String modelo, @DefaultValue("30") int timeoutSegundos) {
+			@DefaultValue("gemini-3.1-flash-lite") String modelo, @DefaultValue("30") int timeoutSegundos) {
 
 		public boolean temChave() {
 			return apiKey != null && !apiKey.isBlank();

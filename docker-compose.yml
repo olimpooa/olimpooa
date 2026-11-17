@@ -1,0 +1,22 @@
+services:
+  achados:
+    build: .
+    ports:
+      - "${PORTA:-8080}:8080"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODELO: ${GEMINI_MODELO:-gemini-3.1-flash-lite}
+      IA_PROVEDOR: ${IA_PROVEDOR:-auto}
+      ADMIN_USUARIO: ${ADMIN_USUARIO:-responsavel}
+      ADMIN_SENHA: ${ADMIN_SENHA:-ucsal2026}
+      NOTIFICACAO_MODO: ${NOTIFICACAO_MODO:-simulado}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+      CARREGAR_DEMO: ${CARREGAR_DEMO:-true}
+    volumes:
+      - dados:/app/data
+      - fotos:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  dados:
+  fotos:

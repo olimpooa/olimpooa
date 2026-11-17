@@ -15,7 +15,14 @@ Projeto do POOALAB 2026.2 (Programação Orientada a Objetos Avançada, UCSal).
 
 ## Integrantes e turma
 
-> Preencher: nome completo, turma e equipe de cada integrante.
+- Cauã de Oliveira Lopes
+- Ryan Abade Oliveira
+- Pedro Luiz de Barros Pereira
+- Arivaldo Teixeira Moraes Neto
+
+Turma: ADS matutina (quartas-feiras, 09:50–12:30).
+
+Documentos da entrega (problema e validação, definição do MVP, roteiro do pitch e declaração de IA): pasta [`docs/`](docs/).
 
 ## Funcionalidades
 
@@ -61,6 +68,17 @@ No Windows (PowerShell): `.\mvnw.cmd spring-boot:run`. Abra <http://localhost:80
 Na primeira execução com o banco vazio são carregados **11 itens e 3 pedidos fictícios** (veja "Demonstração"). Para não
 carregar: `CARREGAR_DEMO=false`. Para recomeçar do zero, apague as pastas `data/` e `uploads/` com a aplicação parada.
 
+### Alternativa com Docker (opcional)
+
+Para quem não tem o JDK, com Docker e Docker Compose instalados:
+
+```bash
+docker compose up --build
+```
+
+A aplicação sobe em <http://localhost:8080>. Para usar a IA real, copie `.env.example` para `.env` e preencha `GEMINI_API_KEY`
+(o `.env` não é versionado). Os dados e as fotos ficam em volumes Docker e persistem entre execuções; `docker compose down -v` apaga tudo.
+
 ### Acesso do responsável (credenciais fictícias de demonstração)
 
 - Endereço: <http://localhost:8080/admin>
@@ -72,7 +90,7 @@ carregar: `CARREGAR_DEMO=false`. Para recomeçar do zero, apague as pastas `data
 | Variável | Padrão | Função |
 |----------|--------|--------|
 | `GEMINI_API_KEY` | vazio | Chave gratuita do Google AI Studio. Sem ela, a catalogação usa o modo simulado |
-| `GEMINI_MODELO` | `gemini-2.5-flash` | Modelo do Gemini usado (troque se a cota/modelo mudar) |
+| `GEMINI_MODELO` | `gemini-3.1-flash-lite` | Modelo do Gemini usado (troque se a cota/modelo mudar) |
 | `IA_PROVEDOR` | `auto` | `auto`, `gemini` ou `simulado` |
 | `NOTIFICACAO_MODO` | `simulado` | `smtp` para enviar e-mails de verdade (defina também `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`) |
 | `EMAIL_RESPONSAVEL` | `responsavel@ucsal.edu.br` | Quem recebe o aviso de novos pedidos |

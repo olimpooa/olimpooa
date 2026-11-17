@@ -12,6 +12,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 import br.ucsal.achados.config.AchadosProperties;
 import br.ucsal.achados.service.ImagemEntrada;
@@ -61,6 +62,9 @@ public class GeminiClient {
 					.retrieve()
 					.body(Map.class);
 			return extrairTexto(resposta);
+		} catch (RestClientResponseException e) {
+			throw new IaIndisponivelException("O Gemini respondeu HTTP " + e.getStatusCode().value()
+					+ " (cota esgotada, modelo ou chave sem permissão).", e);
 		} catch (RestClientException e) {
 			throw new IaIndisponivelException("Falha ao consultar o Gemini (cota, rede ou chave inválida).", e);
 		}
@@ -70,9 +74,16 @@ public class GeminiClient {
 		try {
 			Map<?, ?> candidato = (Map<?, ?>) ((List<?>) resposta.get("candidates")).get(0);
 			Map<?, ?> conteudo = (Map<?, ?>) candidato.get("content");
-			Map<?, ?> parte = (Map<?, ?>) ((List<?>) conteudo.get("parts")).get(0);
-			return parte.get("text").toString();
-		} catch (RuntimeException e) {
+			String texto = ((List<?>) conteudo.get("parts")).stream()
+					.map(p -> (Map<?, ?>) p)
+					.filter(p -> p.get("text") != null && !Boolean.TRUE.equals(p.get("thought")))
+					.map(p -> p.get("text").toString())
+					.collect(java.util.stream.Collectors.joining());
+			if (texto.isBlank()) {
+				throw new IaIndisponivelException("O Gemini devolveu uma resposta vazia.");
+			}
+			return texto;
+		} catch (ClassCastException | NullPointerException | IndexOutOfBoundsException e) {
 			throw new IaIndisponivelException("O Gemini não devolveu conteúdo utilizável (possível bloqueio de segurança).", e);
 		}
 	}

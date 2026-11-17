@@ -51,6 +51,7 @@ public class ItemForm {
 	private String informacoesExtras;
 
 	private MultipartFile foto;
+	private MultipartFile fotoCamera;
 	private String fotoArquivo;
 	private boolean catalogadoPorIa;
 
@@ -156,6 +157,22 @@ public class ItemForm {
 
 	public void setFoto(MultipartFile foto) {
 		this.foto = foto;
+	}
+
+	public MultipartFile getFotoCamera() {
+		return fotoCamera;
+	}
+
+	public void setFotoCamera(MultipartFile fotoCamera) {
+		this.fotoCamera = fotoCamera;
+	}
+
+	/** Foto tirada na câmera ou escolhida como arquivo (a da câmera tem prioridade); nulo se nenhuma foi enviada. */
+	public MultipartFile arquivoEnviado() {
+		if (fotoCamera != null && !fotoCamera.isEmpty()) {
+			return fotoCamera;
+		}
+		return foto != null && !foto.isEmpty() ? foto : null;
 	}
 
 	public String getFotoArquivo() {

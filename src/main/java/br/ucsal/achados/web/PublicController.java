@@ -60,6 +60,12 @@ public class PublicController {
 		return "home";
 	}
 
+	/** Porta de entrada do responsável: pública, sem dados; o login acontece em /admin/login. */
+	@GetMapping("/responsavel")
+	String areaDoResponsavel() {
+		return "responsavel";
+	}
+
 	@GetMapping("/busca-inteligente")
 	String buscaInteligente(@RequestParam(required = false) String descricao, Model model) {
 		model.addAttribute("descricao", descricao);

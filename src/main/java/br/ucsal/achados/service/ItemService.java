@@ -128,8 +128,8 @@ public class ItemService {
 
 	/** Prioriza uma foto recém-enviada; senão mantém a já guardada (cadastro em duas etapas ou edição). */
 	private String resolverFoto(ItemForm form, String fotoAtual) {
-		if (form.getFoto() != null && !form.getFoto().isEmpty()) {
-			return fotos.salvar(fotos.validar(form.getFoto()));
+		if (form.arquivoEnviado() != null) {
+			return fotos.salvar(fotos.validar(form.arquivoEnviado()));
 		}
 		String informada = Texto.vazioParaNulo(form.getFotoArquivo());
 		if (informada == null) {

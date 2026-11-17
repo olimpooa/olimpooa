@@ -88,6 +88,9 @@ public class AdminController {
 			form.setCaracteristicasIdentificadoras(sugestao.caracteristicasIdentificadoras());
 			form.setCatalogadoPorIa(sugestao.geradaPorIa());
 		}
+		if (sugestao.localEncontrado() != null && Texto.vazioParaNulo(form.getLocalEncontrado()) == null) {
+			form.setLocalEncontrado(sugestao.localEncontrado());
+		}
 		model.addAttribute("sugestao", sugestao);
 		return formulario(model, form, itemId);
 	}
@@ -169,8 +172,8 @@ public class AdminController {
 	/** Usa a foto enviada agora (guardando-a) ou a já enviada numa etapa anterior. */
 	private ImagemEntrada obterImagem(ItemForm form) {
 		try {
-			if (form.getFoto() != null && !form.getFoto().isEmpty()) {
-				ImagemEntrada imagem = fotos.validar(form.getFoto());
+			if (form.arquivoEnviado() != null) {
+				ImagemEntrada imagem = fotos.validar(form.arquivoEnviado());
 				form.setFotoArquivo(fotos.salvar(imagem));
 				return imagem;
 			}

@@ -16,9 +16,14 @@
 			<legend>1. Foto e informações de apoio</legend>
 			<div class="grade-form">
 				<div class="campo">
-					<label for="foto">Foto do item</label>
+					<label for="fotoCamera">📷 Tirar foto agora</label>
+					<input id="fotoCamera" type="file" name="fotoCamera" accept="image/*" capture="environment" aria-describedby="ajuda-camera">
+					<p id="ajuda-camera" class="meta">No celular, abre a câmera. No computador, abre a seleção de arquivos.</p>
+				</div>
+				<div class="campo">
+					<label for="foto">📁 Ou anexar um arquivo</label>
 					<input id="foto" type="file" name="foto" accept="image/jpeg,image/png,image/webp">
-					<p class="meta">JPEG, PNG ou WebP, até 5 MB.</p>
+					<p class="meta">JPEG, PNG ou WebP, até 5 MB. Se enviar as duas, vale a foto da câmera.</p>
 				</div>
 				<div class="campo" th:if="${form.fotoArquivo != null}">
 					<span class="rotulo">Foto atual</span>
@@ -27,8 +32,8 @@
 				<div class="campo largo" th:classappend="${#fields.hasErrors('informacoesExtras')} ? 'com-erro'">
 					<label for="informacoesExtras">Informações extras para a IA (opcional)</label>
 					<textarea id="informacoesExtras" rows="2" th:field="*{informacoesExtras}" aria-describedby="ajuda-extras erro-extras"
-							  placeholder="ex.: tem um adesivo de gato, achado perto do bebedouro"></textarea>
-					<p id="ajuda-extras" class="meta">Detalhes que não aparecem na foto ajudam a IA. Não escreva dados pessoais.</p>
+							  placeholder="ex.: achado na sala B415, tem um adesivo de gato"></textarea>
+					<p id="ajuda-extras" class="meta">Detalhes que não aparecem na foto ajudam a IA, e o local citado aqui preenche "Onde foi encontrado". Não escreva dados pessoais.</p>
 					<p id="erro-extras" class="erro-campo" th:if="${#fields.hasErrors('informacoesExtras')}" th:errors="*{informacoesExtras}">Erro</p>
 				</div>
 			</div>

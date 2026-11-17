@@ -12,7 +12,7 @@
 
 | Ferramenta ou modelo | Finalidade ou tarefa | Parte afetada | Revisão e validação realizadas |
 |----------------------|----------------------|---------------|--------------------------------|
-| Claude (Anthropic), via Claude Code | Escrita do código-fonte, dos testes automatizados, dos arquivos Docker, do README e destes documentos, a partir das decisões de escopo da equipe | Todo o repositório (`src/`, `docs/`, `README.md`, `Dockerfile`, `docker-compose.yml`) | Execução da suíte de 28 testes automatizados e uso manual do sistema com dados de demonstração. [A equipe deve acrescentar aqui como revisou e compreendeu o código.] |
+| Claude (Anthropic), via Claude Code | Escrita do código-fonte, dos testes automatizados, dos arquivos Docker, do README e destes documentos, a partir das decisões de escopo da equipe | Todo o repositório (`src/`, `docs/`, `README.md`, `Dockerfile`, `docker-compose.yml`) | Execução da suíte de 32 testes automatizados e uso manual do sistema com dados de demonstração. [A equipe deve acrescentar aqui como revisou e compreendeu o código.] |
 | Google Gemini (API, modelo `gemini-3.1-flash-lite`) | Funcionalidade do produto, em tempo de execução: sugerir a ficha do item a partir da foto e ranquear itens na busca inteligente | `ia/GeminiCatalogador`, `ia/GeminiRankeador`, `ia/GeminiClient` | O responsável revisa e corrige toda sugestão antes de salvar; há fallback manual e por palavras-chave; testes automatizados cobrem a falha da IA. |
 
 **Observações sobre o uso de IA:** a saída da IA não foi apresentada como evidência de validação com usuários reais. A validação

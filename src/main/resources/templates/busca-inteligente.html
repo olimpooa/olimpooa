@@ -26,6 +26,11 @@
 			novos itens são catalogados com frequência.</p>
 		<ol class="sugestoes" th:unless="${#lists.isEmpty(resultado.sugestoes)}">
 			<li th:each="s : ${resultado.sugestoes}" class="sugestao">
+				<a class="sugestao-foto" th:href="@{/itens/{id}(id=${s.item.id})}" aria-hidden="true" tabindex="-1">
+					<img th:if="${s.item.temFoto}" th:src="@{/fotos/{id}(id=${s.item.id})}" alt="">
+					<span th:unless="${s.item.temFoto}" class="sem-foto" th:text="${s.item.sensivel} ? '🔒' : '📦'"></span>
+				</a>
+				<div class="sugestao-texto">
 				<h2><a th:href="@{/itens/{id}(id=${s.item.id})}" th:text="${s.item.titulo}">Título</a></h2>
 				<p class="meta">
 					<span th:text="${s.item.categoria.rotulo}">Categoria</span> ·
@@ -39,6 +44,7 @@
 					<strong th:text="${s.pontuacao} + '%'">80%</strong>
 				</p>
 				<p th:if="${s.justificativa != null}" th:text="${s.justificativa}">Justificativa</p>
+				</div>
 			</li>
 		</ol>
 	</th:block>

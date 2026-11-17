@@ -110,7 +110,7 @@ $env:GEMINI_API_KEY = "sua-chave"
 ./mvnw test
 ```
 
-Os testes (28) cobrem as transições de status, o fluxo cadastro → pedido → devolução, pedidos concorrentes e cancelamento, a ocultação de
+Os testes (32) cobrem as transições de status, o fluxo cadastro → pedido → devolução, pedidos concorrentes e cancelamento, a ocultação de
 itens sensíveis, a busca com sinônimos, a validação do e-mail `@ucsal.edu.br`, o acesso restrito do responsável e o fallback da IA.
 Eles não usam rede nem chave de API.
 

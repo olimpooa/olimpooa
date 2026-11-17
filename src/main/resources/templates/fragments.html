@@ -14,14 +14,7 @@
 		<nav aria-label="Principal">
 			<a th:href="@{/}">Itens</a>
 			<a th:href="@{/busca-inteligente}">Busca inteligente</a>
-			<th:block th:if="${logado}">
-				<a th:href="@{/admin}">Painel</a>
-				<a th:href="@{/admin/itens/novo}">Cadastrar item</a>
-				<form class="inline" th:action="@{/admin/logout}" method="post">
-					<button type="submit" class="link">Sair</button>
-				</form>
-			</th:block>
-			<a th:unless="${logado}" th:href="@{/admin}">Área do responsável</a>
+			<a class="nav-responsavel" th:href="@{/responsavel}" th:text="${logado} ? '🔓 Área do responsável' : '🔒 Sou o responsável'">Sou o responsável</a>
 		</nav>
 	</div>
 </header>

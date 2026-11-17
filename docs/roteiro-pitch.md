@@ -12,7 +12,7 @@
 | **Proposta** (1:15–1:50) | Qual resultado o MVP permite alcançar. | O aluno vê online se o objeto está lá e sinaliza que é dele; o funcionário cataloga por foto com IA. A entrega continua presencial. |
 | **Demonstração** (1:50–3:30) | Execução do fluxo principal com dados preparados. | 1) Cadastro com foto + IA no `/admin`. 2) Aluno busca "headphone branco" e pede o item. 3) Status vira *Em análise*; dois pedidos no mesmo item. 4) Responsável marca *Devolvido*; histórico e e-mails. |
 | **Decisões e limites** (3:30–4:20) | Justificativa do escopo e limitações conhecidas. | Itens sensíveis ocultos; conferência presencial; IA com fallback; limitações: uma entrevista, sem conta de aluno, matrícula só validada no formato. |
-| **Aprendizado** (4:20–5:00) | Resultado alcançado e próximo passo mais importante. | Fluxo completo funcionando e testado (28 testes). Próximo passo: testar com o setor real e definir retenção de dados. |
+| **Aprendizado** (4:20–5:00) | Resultado alcançado e próximo passo mais importante. | Fluxo completo funcionando e testado (32 testes). Próximo passo: testar com o setor real e definir retenção de dados. |
 
 ## Divisão de falas (sugestão: 4 integrantes)
 

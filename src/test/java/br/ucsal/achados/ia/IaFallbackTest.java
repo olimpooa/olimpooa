@@ -50,6 +50,15 @@ class IaFallbackTest {
 	}
 
 	@Test
+	void catalogadorSimuladoExtraiOLocalCitadoNasInformacoesExtras() {
+		var simulado = new CatalogadorSimulado();
+
+		assertThat(simulado.analisar(null, "garrafa azul achada na sala b415").localEncontrado()).isEqualTo("Sala B415");
+		assertThat(simulado.analisar(null, "fone perto da biblioteca").localEncontrado()).isEqualTo("Biblioteca");
+		assertThat(simulado.analisar(null, "mochila preta").localEncontrado()).isNull();
+	}
+
+	@Test
 	void catalogadorSimuladoDeduzCategoriaECorDoTexto() {
 		SugestaoItem sugestao = new CatalogadorSimulado().analisar(null, "Garrafa azul perto do bebedouro");
 

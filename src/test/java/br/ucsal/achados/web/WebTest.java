@@ -70,6 +70,37 @@ class WebTest {
 	}
 
 	@Test
+	void paginaDeEntradaDoResponsavelEPublicaEApontaParaOLogin() throws Exception {
+		mvc.perform(get("/responsavel")).andExpect(status().isOk()).andExpect(view().name("responsavel"))
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("/admin/login")))
+				.andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("/admin/itens/novo"))));
+	}
+
+	@Test
+	@WithMockUser(roles = "RESPONSAVEL")
+	void responsavelLogadoVeAtalhosNaPaginaDeEntrada() throws Exception {
+		mvc.perform(get("/responsavel")).andExpect(status().isOk())
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("/admin/itens/novo")));
+	}
+
+	@Test
+	void buscaInteligenteMostraFotoDoItemQuandoExiste() throws Exception {
+		ItemForm form = new ItemForm();
+		form.setTitulo("Garrafa com foto");
+		form.setCategoria(Categoria.GARRAFA_MARMITA);
+		form.setLocalEncontrado("Cantina");
+		form.setDataEncontrado(LocalDate.now());
+		byte[] png = java.util.Base64.getDecoder().decode(
+				"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==");
+		form.setFoto(new org.springframework.mock.web.MockMultipartFile("foto", "f.png", "image/png", png));
+		Item item = itens.cadastrar(form, "teste");
+
+		mvc.perform(get("/busca-inteligente").param("descricao", "garrafa"))
+				.andExpect(status().isOk())
+				.andExpect(content().string(org.hamcrest.Matchers.containsString("/fotos/" + item.getId())));
+	}
+
+	@Test
 	@WithMockUser(roles = "RESPONSAVEL")
 	void responsavelAcessaPainel() throws Exception {
 		mvc.perform(get("/admin")).andExpect(status().isOk()).andExpect(view().name("admin/painel"));

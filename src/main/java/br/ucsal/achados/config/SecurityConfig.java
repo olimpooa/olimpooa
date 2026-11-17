@@ -28,11 +28,11 @@ public class SecurityConfig {
 				.formLogin(form -> form
 						.loginPage("/admin/login")
 						.loginProcessingUrl("/admin/login")
-						.defaultSuccessUrl("/admin", true)
+						.defaultSuccessUrl("/responsavel?entrou", true)
 						.failureUrl("/admin/login?erro"))
 				.logout(logout -> logout
 						.logoutUrl("/admin/logout")
-						.logoutSuccessUrl("/"))
+						.logoutSuccessUrl("/responsavel"))
 				.headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives(
 						"default-src 'self'; img-src 'self' data:; style-src 'self'; form-action 'self'; frame-ancestors 'none'")));
 		return http.build();

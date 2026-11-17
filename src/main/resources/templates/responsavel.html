@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Área do responsável')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecalho}"></header>
+<main id="conteudo" class="container estreito">
+	<h1>Área do responsável</h1>
+
+	<section class="caixa" th:unless="${logado}">
+		<p>Esta área é só para quem cuida do setor de Achados e Perdidos: aqui os itens são cadastrados, os pedidos dos alunos
+			são conferidos e as devoluções são registradas.</p>
+		<p class="meta">Alunos não precisam entrar: a consulta de itens e o pedido de interesse são abertos a todos.</p>
+		<a class="botao grande" th:href="@{/admin/login}">Entrar como responsável</a>
+	</section>
+
+	<section th:if="${logado}">
+		<p class="alerta sucesso" role="status" th:if="${param.entrou}">Você entrou como responsável.</p>
+		<p>O que você quer fazer?</p>
+		<ul class="atalhos">
+			<li><a class="atalho" th:href="@{/admin/itens/novo}"><strong>📷 Cadastrar item</strong><span>Foto, local e ficha sugerida por IA</span></a></li>
+			<li><a class="atalho" th:href="@{/admin}"><strong>📋 Painel e itens</strong><span>Pedidos, status e devoluções</span></a></li>
+			<li><a class="atalho" th:href="@{/admin/emails}"><strong>✉ Caixa de saída</strong><span>E-mails enviados aos alunos</span></a></li>
+		</ul>
+		<form th:action="@{/admin/logout}" method="post">
+			<button type="submit" class="botao secundario">Sair da área do responsável</button>
+		</form>
+	</section>
+</main>
+<footer th:replace="~{fragments :: rodape}"></footer>
+</body>
+</html>

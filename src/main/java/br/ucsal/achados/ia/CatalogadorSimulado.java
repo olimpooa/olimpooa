@@ -3,6 +3,8 @@ package br.ucsal.achados.ia;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,8 @@ import br.ucsal.achados.util.Texto;
 @Component
 public class CatalogadorSimulado implements CatalogadorIA {
 
+	private static final Pattern LOCAL = Pattern.compile(
+			"(?iu)\\b(sala|bloco|laborat[óo]rio|lab)\\s+[\\p{L}]?-?\\d*[\\p{L}]?\\d*\\b|\\b(biblioteca|cantina|audit[óo]rio|estacionamento|portaria)\\b");
 	private static final Map<String, Categoria> PALAVRAS_CATEGORIA = new LinkedHashMap<>();
 	private static final List<String> CORES = List.of("preto", "branco", "azul", "vermelho", "verde", "amarelo",
 			"cinza", "rosa", "roxo", "laranja", "marrom", "prata", "dourado");
@@ -61,12 +65,28 @@ public class CatalogadorSimulado implements CatalogadorIA {
 		String objeto = palavras.stream().filter(PALAVRAS_CATEGORIA::containsKey).findFirst().orElse(null);
 		String cor = palavras.stream().filter(CORES::contains).findFirst().orElse(null);
 		String aviso = "Modo simulado (sem IA real): categoria e cor foram deduzidas do texto informado. Revise todos os campos.";
+		String local = extrairLocal(informacoesExtras);
 		if (objeto == null) {
-			return new SugestaoItem(null, Categoria.OUTROS, cor, null, Texto.vazioParaNulo(informacoesExtras), null, nome(), aviso, false);
+			return new SugestaoItem(null, Categoria.OUTROS, cor, null, Texto.vazioParaNulo(informacoesExtras), null,
+					local, nome(), aviso, false);
 		}
 		String titulo = Texto.juntar(capitalizar(objeto), cor);
 		return new SugestaoItem(titulo, PALAVRAS_CATEGORIA.get(objeto), cor, null,
-				Texto.vazioParaNulo(informacoesExtras), null, nome(), aviso, false);
+				Texto.vazioParaNulo(informacoesExtras), null, local, nome(), aviso, false);
+	}
+
+	/** Reconhece locais comuns do campus, como "sala b415", "bloco c" ou "biblioteca". */
+	private static String extrairLocal(String texto) {
+		if (texto == null) {
+			return null;
+		}
+		Matcher m = LOCAL.matcher(texto);
+		if (!m.find()) {
+			return null;
+		}
+		return java.util.Arrays.stream(m.group().strip().split("\\s+"))
+				.map(p -> p.length() <= 2 || p.chars().anyMatch(Character::isDigit) ? p.toUpperCase() : capitalizar(p))
+				.collect(java.util.stream.Collectors.joining(" "));
 	}
 
 	private static String capitalizar(String palavra) {
